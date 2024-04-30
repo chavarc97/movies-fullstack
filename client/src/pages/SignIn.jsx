@@ -1,6 +1,47 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {signInStart, signInFailure, signInSuccess} from "../redux/user/userSlice";
 
 const SignIn = () => {
+  // 1. Create a state variable to store the form data
+  const [formData, setFormData] = useState({});
+  // 2 Create a state variable to store the error
+  const { loading, error } = useSelector((state) => state.user);
+  // 3. Create a navigate function and dispatch function
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  // 4. Create a function to handle changes in the form
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  // 5. Create a function to handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    dispatch(signInStart());
+    try {
+      // 6. Make a POST request to the server
+      const res = await fetch("/api/auth/signIn", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signInFailure(data.message));
+        return;
+      }
+      // 7. Dispatch the signInSuccess action and navigate to the home page
+      dispatch(signInSuccess(data));
+      navigate("/");
+    } catch (error) {
+      dispatch(signInFailure(error.message))
+    }
+  };
   return (
     <main className="w-full h-screen flex items-start">
       <div className="  sm:relative w-1/2 h-full flex flex-col">
@@ -23,37 +64,33 @@ const SignIn = () => {
           Movie<span className="text-cyan-600 font-bold">Mate</span>
         </h1>
 
-        <form className=" flex flex-col mt-10 w-2/3 mx-auto">
+        <form onSubmit={handleSubmit} className=" flex flex-col mt-10 w-2/3 mx-auto">
           <h3 className="text-xl font-semibold mb-3 ">Sign in</h3>
           <p className="text-sm  mb-2">Welcome! Please enter your credential</p>
-
           <input
-            type="text"
-            placeholder="username"
-            id="username"
-            className="mt-5 border-b border-neutral-400 bg-transparent focus:outline-none"
-          />
-          <input
+            onChange={handleChange}
             type="email"
             placeholder="email"
             id="email"
             className="mt-5 border-b border-neutral-400 bg-transparent focus:outline-none"
           />
           <input
+            onChange={handleChange}
             type="password"
             placeholder="password"
             id="password"
             className="mt-5 border-b border-neutral-400 bg-transparent focus:outline-none"
           />
-          <button className="hover:shadow-lg mt-10 p-3 bg-neutral-800 text-white rounded">
-            Sign In
+          <button disabled={loading} className="hover:shadow-lg mt-10 p-3 bg-neutral-800 text-white rounded">
+          {loading ? "Loading..." : "Sign In"}
           </button>
+          {error && <p className=" text-amber-700 mt-3 ">{error}</p>}
         </form>
 
         <div className="w-full flex flex-wrap gap-2 text-sm">
-          <p>Already have an account?</p>
+          <p>Don't have an account?</p>
           <Link className="text-cyan-600 font-semibold hover:text-cyan-500">
-            Sign in here
+            Sign up here
           </Link>
         </div>
       </div>

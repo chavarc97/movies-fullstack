@@ -99,12 +99,12 @@ const SignUp = () => {
           <button disabled={loading} className="mt-10 p-3 bg-neutral-800 text-white rounded">
             {loading ? "Loading..." : "Sign Up"}
           </button>
-          {error && <p className=" text-red-500 mt-3">{error}</p>}
+          {error && <p className=" text-amber-700 mt-3">{error}</p>}
         </form>
 
         <div className="w-full flex flex-wrap gap-2 text-sm">
           <p>Already have an account?</p>
-          <Link className="text-cyan-600 font-semibold underline-offset-2">
+          <Link to={'/sign-in'} className="text-cyan-600 font-semibold underline-offset-2">
             Sign in here
           </Link>
         </div>
