@@ -1,6 +1,51 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  // 1. Create a state variable to store the form data
+  const [formData, setFormData] = useState({});
+  console.log(formData);
+  // 2. Create a state variable to store the error message
+  const [error, setError] = useState(null);
+  // 3. Create a state variable to store the loading state
+  const [loading, setLoading] = useState(false);
+  // 4. Create a navigate function
+  const navigate = useNavigate();
+
+  // 5. Create a function to handle changes in the form
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  // 6. Create a function to handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      // 7. Make a POST request to the server
+      const res = await fetch("/api/auth/signUp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setLoading(false);
+        setError(data.message);
+        return;
+      }
+      setLoading(false);
+      setError(null);
+      navigate("/sign-in");
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  };
+
   return (
     <main className="w-full h-screen flex items-start">
       <div className="  sm:relative w-1/2 h-full flex flex-col">
@@ -23,31 +68,38 @@ const SignUp = () => {
           Movie<span className="text-cyan-600 font-bold">Mate</span>
         </h1>
 
-        <form className=" flex flex-col mt-10 w-2/3 mx-auto">
+        <form
+          onSubmit={handleSubmit}
+          className=" flex flex-col mt-10 w-2/3 mx-auto"
+        >
           <h3 className="text-xl font-semibold mb-3 ">Sign up</h3>
           <p className="text-sm  mb-2">Welcome! Please enter your credential</p>
 
           <input
+            onChange={handleChange}
             type="text"
             placeholder="username"
             id="username"
             className="mt-5 border-b border-neutral-400 bg-transparent focus:outline-none"
           />
           <input
+            onChange={handleChange}
             type="email"
             placeholder="email"
             id="email"
             className="mt-5 border-b border-neutral-400 bg-transparent focus:outline-none"
           />
           <input
+            onChange={handleChange}
             type="password"
             placeholder="password"
             id="password"
             className="mt-5 border-b border-neutral-400 bg-transparent focus:outline-none"
           />
-          <button className="mt-10 p-3 bg-neutral-800 text-white rounded">
-            Sign Up
+          <button disabled={loading} className="mt-10 p-3 bg-neutral-800 text-white rounded">
+            {loading ? "Loading..." : "Sign Up"}
           </button>
+          {error && <p className=" text-red-500 mt-3">{error}</p>}
         </form>
 
         <div className="w-full flex flex-wrap gap-2 text-sm">
