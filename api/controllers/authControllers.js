@@ -11,6 +11,10 @@ export const signUp = asyncHandler(async (req, res, next) => {
   // create a new user
   const newUser = new User({ username, email, password: hashedPassword });
   try {
+    const registeredUser = await User.findOne({ email });
+    if (registeredUser) {
+      return next(errorHandler(400, "User already exists"));
+    }
     await newUser.save();
     res.status(201).json({
       message: "User created successfully",
