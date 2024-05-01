@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { errorHandler } from './error.js';
+import { errorHandler } from './errorHandler.js';
 
 // 1. Create a middleware function called verifyUser
 export const verifyToken = (req, res, next) => {
