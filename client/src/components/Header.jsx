@@ -6,7 +6,7 @@ const Header = () => {
     <div className="bg-transparent backdrop-blur-md shadow-md w-full fixed top-0 left-0 z-10">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <Link to={'/'}>
-          <h1 className="font-bold underline-offset-8  text-neutral-100  text-sm sm:text-lg flex flex-wrap">
+          <h1 className="font-bold underline-offset-8  text-neutral-700  text-sm sm:text-lg flex flex-wrap">
             Movie<span className="text-cyan-600">Mate</span>
           </h1>
         </Link>
