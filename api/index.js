@@ -5,6 +5,7 @@ dotenv.config();
 import cookieParser from "cookie-parser";
 import userRouter from './routes/userRoutes.js'
 import authRouter from './routes/authRoutes.js'
+import movieRouter from './routes/movieRoutes.js'
 import connectDB from './config/db.js'
 
 const PORT = process.env.PORT || 5000;
@@ -27,6 +28,7 @@ app.listen(PORT,() => {
 // routes 
 app.use('/api/users', userRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/movies', movieRouter);
 
 
 app.use((err, req, res, next) => {
