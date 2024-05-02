@@ -12,9 +12,6 @@ import {
 } from "firebase/storage";
 import { useDispatch } from "react-redux";
 import {
-  signInStart,
-  signInSuccess,
-  signInFailure,
   updateUserStart,
   updateUserFailure,
   updateUserSuccess,
@@ -32,7 +29,7 @@ const Profile = () => {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
-  console.log(formData);
+  const [updateSucces, setUpdateSuccess] = useState(false);
 
   const dispatch = useDispatch();
   // 1. Create a function to handle file upload
@@ -68,8 +65,9 @@ const Profile = () => {
 
   // 2. Create a function to handle form change
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
   // 3. Create a function to handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,6 +81,9 @@ const Profile = () => {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message));
+      }
       dispatch(updateUserSuccess(data));
     } catch (error) {
       dispatch(updateUserFailure(error.message));
@@ -90,10 +91,42 @@ const Profile = () => {
   };
   // 4. Create a function to delete user
   const handleDelete = async () => {
-    
+    try {
+      // start the delete user process
+      dispatch(deleteUserStart());
+      // make a request to delete user
+      const res = await fetch(`/api/users/delete/${currentUser._id}`, {
+        method: "DELETE", // delete request
+      });
+      // get the response data
+      const data = await res.json();
+      // check if the request was successful
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      // if successful, dispatch the success action
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
   };
   // 5. Create a function to log out user
-  const handleLogout = async () => {};
+  const handleLogout = async () => {
+    try {
+      dispatch(signOutStart());
+      const res = await fetch("/api/auth/signout/");
+      // get the response data
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signOutFailure(data.message));
+        return;
+      }
+      dispatch(signOutSuccess(data));
+    } catch (error) {
+      dispatch(signOutFailure(error.message));
+    }
+  };
 
   return (
     <main className="p-3 max-w-lg mx-auto my-6 mt-32">
@@ -132,6 +165,7 @@ const Profile = () => {
           type="text"
           className="mt-4 mx-5 bg-neutral-100 p-3 rounded border-b"
           placeholder="username"
+          id="username"
           defaultValue={currentUser.username}
           onChange={handleChange}
         />
@@ -139,6 +173,7 @@ const Profile = () => {
           type="email"
           className=" mx-5 bg-neutral-100 p-3 rounded border-b"
           placeholder="email"
+          id="email"
           defaultValue={currentUser.email}
           onChange={handleChange}
         />
@@ -146,6 +181,7 @@ const Profile = () => {
           type="password"
           className=" mx-5 bg-neutral-100 p-3 rounded border-b"
           placeholder="password"
+          id="password"
           onChange={handleChange}
         />
         <button
@@ -155,21 +191,31 @@ const Profile = () => {
         >
           {loading ? "loading..." : "update"}
         </button>
+        <Link 
+          className="text-center bg-neutral-400 p-3 mx-5 uppercase 
+        hover:shadow-lg text-neutral-50 rounded"
+        >
+          Upload Movie
+        </Link>
       </form>
       <div className=" flex justify-between gap-8 py-4 mx-6 mt-4">
-          <button
-            onClick={handleDelete}
-            className="text-xl font-medium text-cyan-600 hover:underline"
-          >
-            <TiUserDelete />
-          </button>
-          <button
-            onClick={handleLogout}
-            className="text-xl font-medium text-cyan-600 hover:underline"
-          >
-            <HiLogout />
-          </button>
+        <button
+          onClick={handleDelete}
+          className="text-xl font-medium text-cyan-600 hover:underline"
+        >
+          <TiUserDelete />
+        </button>
+        <button
+          onClick={handleLogout}
+          className="text-xl font-medium text-cyan-600 hover:underline"
+        >
+          <HiLogout />
+        </button>
       </div>
+      <p className="text-amber-700 mt-5">{error ? error : ""}</p>
+      <p className="text-cyan-600 mt-5">
+        {updateSucces ? "User updated succesfully!" : ""}
+      </p>
     </main>
   );
 };

@@ -31,7 +31,7 @@ const Header = () => {
               About
             </li>
           </Link>
-          <Link to={"/about"}>
+          <Link to={"/profile"}>
             <li className=" hidden sm:inline text-neutral-900 hover:underline">
               Profile
             </li>
