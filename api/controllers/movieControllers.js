@@ -1,4 +1,5 @@
 import Movie from "../models/movieModel.js";
+import Genre from "../models/genreModel.js";
 import asyncHandler from "express-async-handler";
 
 export const getMovies = asyncHandler(async (req, res, next) => {
@@ -22,6 +23,14 @@ export const getMovies = asyncHandler(async (req, res, next) => {
       filter.title = { $regex: new RegExp(req.query.title, "i") }; // Case-insensitive search
     }
 
+    // Check if 'releaseDate' parameter is provided
+    if (req.query.release_date) {
+      filter.release_date = req.query.release_dat
+    }
+
+    // Check if 'genre' parameter is provided
+    
+
     const movies = await Movie.find(filter)
       .limit(limit)
       .skip(startIndex)
@@ -33,6 +42,18 @@ export const getMovies = asyncHandler(async (req, res, next) => {
       success: true,
       data: movies,
       totalCount: totalMoviesCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+export const getGenres = asyncHandler(async (req, res, next) => {
+  try {
+    const genres = await Genre.find({}).exec();
+    res.status(200).json({
+      success: true,
+      data: genres,
     });
   } catch (error) {
     next(error);

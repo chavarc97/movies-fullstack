@@ -9,11 +9,12 @@ const movieSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  genreIds: {
-    type: Array,
-    required: true,
-    ref: "Genre",
-  },
+  genre_ids: [
+    {
+      type: Number,
+      ref: 'Genre'
+    }
+  ],
   id: {
     type: Number,
   },

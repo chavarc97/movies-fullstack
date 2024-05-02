@@ -8,12 +8,14 @@ import MovieCard from "../components/MovieCard";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [actionMovies, setActionMovies] = useState([]);
   SwiperCore.use([Navigation]);
-  console.log(movies);
+  console.log(genres);
 
   useEffect(() => {
     const fetchMovies = async () => {
-      const res = await fetch("/api/movies/get?limit=9");
+      const res = await fetch("/api/movies/get?limit=6");
       const data = await res.json();
       setMovies(data);
     };
@@ -66,7 +68,9 @@ const Home = () => {
         {movies.data && movies.data.length > 0 && (
           <div className=" justify-items-center">
             <div className="my-3">
-              <h2 className="text-2xl font-semibold text-cyan-800">Recent Movies</h2>
+              <h2 className="text-2xl font-semibold text-cyan-800">
+                Recent Movies
+              </h2>
             </div>
             <div className="flex flex-wrap gap-6 w-full justify-center">
               {movies.data.map((movie) => (
